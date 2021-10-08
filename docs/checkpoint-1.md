@@ -22,9 +22,27 @@
 
 ### Internal API Endpoints
 
+####Authorization:
+* POST /user
+* GET /user
+* PUT /user/{userId}
+* DELETE /user
+
+####Cache: 
+* POST /cache
+* GET /cache
+* PUT /cache/{cacheId}
+* DELETE /cache
+
+####File
+* POST /file
+* GET /file
+* PUT /file/{fileId}
+* DELETE /file
 
 ### Used Technologies
 
+Golang, go-micro, Redis, CockroachDB
 
 ### Architecture of the System
 ![architecture.jpg](./assets/architecture.jpg)
