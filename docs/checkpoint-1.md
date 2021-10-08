@@ -22,23 +22,17 @@
 
 ### Internal API Endpoints
 
-####Authorization:
+#### Authorization:
 * POST /user
 * GET /user
 * PUT /user/{userId}
 * DELETE /user
 
-####Cache: 
+#### Cache: 
 * POST /cache
 * GET /cache
 * PUT /cache/{cacheId}
 * DELETE /cache
-
-####File
-* POST /file
-* GET /file
-* PUT /file/{fileId}
-* DELETE /file
 
 ### Used Technologies
 
