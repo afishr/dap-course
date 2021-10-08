@@ -27,7 +27,7 @@ Response example:
 {
   "_id": "507f191e810c19729de860ea",
   "title": "architecture.png",
-  "link": "https://srvc.nm/507f191e810c19729de860ea"
+  "link": "https://srvc.nm/507f191e810c19729de860ea",
   "author": {
     "id": 423,
     ...
