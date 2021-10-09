@@ -65,17 +65,7 @@ Response example:
 
 ### Internal API Endpoints
 
-#### Authorization:
-* POST /user
-* GET /user
-* PUT /user/{userId}
-* DELETE /user
-
-#### Cache: 
-* POST /cache
-* GET /cache
-* PUT /cache/{cacheId}
-* DELETE /cache
+User, Cache and File services provide just simple CRUD API to operate with the their base data accordingly
 
 ### Used Technologies
 
