@@ -3,19 +3,14 @@
 
 ### The Services
 
-#### Load Balancer
-Implements service discovery. Once we have the addresses of any number of instances of a service we now need a way to decide which node to route to. We use random hashed load balancing to provide even distribution across the services and retry a different node if there's a problem.
-
-#### Public API Service
+#### The Gateway
+Implements service discovery. Once we have the addresses of any number of instances of a service we now need a way to decide which node to route to. We use round robin load balancing to provide even distribution across the services and retry a different node if there's a problem.
 This service is meant to be a facade for all client requests and request other services in order to formulate response.
 
-#### User Service
-This service helps to manage users, their authentication and authorization.
-
-#### Cache Service
+#### The Cache
 This service is used to store for a short period of time some data that is hard to compute like rendered pages or slow SQL queries.
 
-#### File Storage Service
+#### The Service
 File storage is simple data store interface to read, write and delete records.
 
 ### Outbound API Endpoints
