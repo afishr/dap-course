@@ -1,14 +1,23 @@
 const express = require('express');
-const morgan = require("morgan");
+const morgan = require('morgan');
 const { createProxyMiddleware } = require('http-proxy-middleware');
-
 
 const PORT = 80;
 const HOST = 'localhost';
-const children = [
-  'http://localhost:3001'
-];
-const currentChild = 0;
+const children = ['http://localhost:1234', 'http://localhost:4321'];
+
+const currentChildIterator = (childrenSize, start = -1) => {
+  return () => {
+    start++;
+
+    if (start >= childrenSize) {
+      start = 0;
+    }
+
+    return start;
+  };
+};
+const getCurrentChild = currentChildIterator(children.length);
 
 const app = express();
 
@@ -19,8 +28,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(
   '/',
   createProxyMiddleware({
-    target: children[currentChild],
     changeOrigin: false,
+    router: () => {
+      return children[getCurrentChild()]
+  }
   }),
 );
 
