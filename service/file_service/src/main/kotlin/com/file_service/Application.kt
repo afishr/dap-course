@@ -8,7 +8,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
 fun main() {
-    embeddedServer(Netty, port = 8082, host = "0.0.0.0") {
+    embeddedServer(Netty, port = 3050, host = "0.0.0.0") {
         configureDependencyInjection()
         configureRouting()
         configureSerialization()
