@@ -4,3 +4,7 @@ services:
     build: ./gateway/
     ports:
       - "80:80"
+  file_service:
+    build: ./service/file_service
+    ports:
+      - "3050:3050"

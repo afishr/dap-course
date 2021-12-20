@@ -9,11 +9,16 @@ import java.io.File
 
 class FileService {
     companion object {
-        const val FILE_DIRECTORY_PATH = "/Users/pavelbugaian/ktor/uploads/"
+        const val FILE_DIRECTORY_PATH = "\$HOME/ktor/FILEUPLOADS"
     }
 
     suspend fun uploadFile(call: ApplicationCall) {
         val multipart = call.receiveMultipart()
+        val directory = File(FILE_DIRECTORY_PATH)
+
+        if(!directory.exists()) {
+            directory.mkdirs()
+        }
 
         multipart.forEachPart { part ->
 
@@ -39,6 +44,8 @@ class FileService {
             // make sure to dispose of the part after use to prevent leaks
             part.dispose()
         }
+
+        call.respondText("OK", status = HttpStatusCode.Created)
     }
 
     suspend fun downloadFile(call: ApplicationCall) {

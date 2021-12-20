@@ -4,20 +4,10 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const PORT = 80;
 const HOST = 'localhost';
-const children = ['http://localhost:1234', 'http://localhost:4321'];
-
-const currentChildIterator = (childrenSize, start = -1) => {
-  return () => {
-    start++;
-
-    if (start >= childrenSize) {
-      start = 0;
-    }
-
-    return start;
-  };
+const children = {
+  'file': 'http://localhost:3050',
+  'cache': 'http://localhost:3050',
 };
-const getCurrentChild = currentChildIterator(children.length);
 
 const app = express();
 
@@ -29,9 +19,13 @@ app.use(
   '/',
   createProxyMiddleware({
     changeOrigin: false,
-    router: () => {
-      return children[getCurrentChild()]
-  }
+    router: (req) => {
+      const path = req.path.split('/');
+
+      console.log(`Request on /${path[1]}`)
+
+      return children[path[1]]
+    }
   }),
 );
 
