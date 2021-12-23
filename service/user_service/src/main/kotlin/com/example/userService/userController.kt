@@ -20,25 +20,40 @@ fun Application.configureUserController(userService: UserService) {
     val myRealm = environment.config.property("ktor.jwt.realm").getString()
 
     routing {
-        post("/authorize") {
-            val user = call.receive<User>()
+        route("/user") {
+            post("/login") {
+                val user = call.receive<User>()
 
-            user.name?.let { name ->
-                val allUsers = userService.getAllUsers()
+                user.name?.let { name ->
+                    val allUsers = userService.getAllUsers()
 
-                allUsers.findLast {
-                    it.name == name
-                }?.let {
-                    val token = JWT.create()
-                        .withAudience(audience)
-                        .withIssuer(issuer)
-                        .withClaim("username", user.name)
-                        .withExpiresAt(Date(System.currentTimeMillis() + 60000))
-                        .sign(Algorithm.HMAC256(secret))
+                    allUsers.findLast {
+                        it.name == name
+                    }?.let {
+                        val token = JWT.create()
+                            .withAudience(audience)
+                            .withIssuer(issuer)
+                            .withClaim("username", user.name)
+                            .withExpiresAt(Date(System.currentTimeMillis() + 60000))
+                            .sign(Algorithm.HMAC256(secret))
 
-                    call.respond(hashMapOf("token" to token))
-                } ?: call.respond(HttpStatusCode.Unauthorized, "No such user")
-            } ?: call.respond(HttpStatusCode.Unauthorized, "Please enter valid username")
+                        call.respond(hashMapOf("token" to token))
+                    } ?: call.respond(HttpStatusCode.Unauthorized, "No such user")
+                } ?: call.respond(HttpStatusCode.Unauthorized, "Please enter valid username")
+            }
+
+            get("/authenticate") {
+                val token = call.request.headers["Authorization"]
+
+                val decodedToken = JWT.decode(token)
+
+                if(decodedToken.expiresAt.after(Date())) {
+                    call.respond(HttpStatusCode.OK, "User authenticated")
+                } else {
+                    call.respond(HttpStatusCode.Unauthorized, "Unauthorized")
+                }
+            }
         }
     }
+
 }

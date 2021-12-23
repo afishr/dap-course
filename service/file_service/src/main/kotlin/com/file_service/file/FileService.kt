@@ -9,7 +9,7 @@ import java.io.File
 
 class FileService {
     companion object {
-        const val FILE_DIRECTORY_PATH = "\$HOME/ktor/FILEUPLOADS"
+        const val FILE_DIRECTORY_PATH = "FILEUPLOADS"
     }
 
     suspend fun uploadFile(call: ApplicationCall) {
@@ -24,10 +24,9 @@ class FileService {
 
             // if part is a file (could be form item)
             if (part is PartData.FileItem) {
-
                 // retrieve file name of upload
                 val name = part.originalFileName!!
-                val file = File("$FILE_DIRECTORY_PATH$name")
+                val file = File(FILE_DIRECTORY_PATH, name)
 
                 // use InputStream from part to save file
                 part.streamProvider().use { its ->
@@ -53,14 +52,19 @@ class FileService {
         // get filename from request url
         val filename = call.parameters["name"]!!
 
+        println("filename $filename")
+        println("$FILE_DIRECTORY_PATH exists ${File(FILE_DIRECTORY_PATH).exists()}")
+
         // construct reference to file
         // ideally this would use a different filename
-        val file = File("$FILE_DIRECTORY_PATH$filename")
+        val file = File(FILE_DIRECTORY_PATH, filename)
+        println("file.absolutePath ${file.absolutePath}")
+        println("file.exists ${file.exists()}")
 
         if (file.exists()) {
             call.respondFile(file)
         } else {
-            call.respond(HttpStatusCode.NotFound)
+            call.respond(HttpStatusCode.NotFound, "File does not exist")
         }
     }
 }

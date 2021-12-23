@@ -6,6 +6,7 @@ const PORT = 80;
 const HOST = 'localhost';
 const children = {
   'file': 'http://localhost:3050',
+  'user': 'http://localhost:8084',
   'cache': 'http://localhost:3050',
 };
 
@@ -15,17 +16,34 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Authorization
+app.use('/', (req, res, next) => {
+  if (req.headers.authorization) {
+    next();
+  } else {
+    res.sendStatus(403);
+  }
+});
+
 app.use(
-  '/',
+  '/fileService',
   createProxyMiddleware({
-    changeOrigin: false,
-    router: (req) => {
-      const path = req.path.split('/');
+    target: 'http://dap-course_file_service_1:3050',
+    changeOrigin: true,
+    pathRewrite: {
+      [`^/fileService`]: '',
+    },
+  })
+);
 
-      console.log(`Request on /${path[1]}`)
-
-      return children[path[1]]
-    }
+app.use(
+  '/userService',
+  createProxyMiddleware({
+    target: 'http://dap-course_user_service_1:8084',
+    changeOrigin: true,
+    pathRewrite: {
+      [`^/userService`]: '',
+    },
   }),
 );
 

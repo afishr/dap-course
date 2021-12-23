@@ -1,5 +1,14 @@
 version: "3.9"
 services:
+  database:
+    container_name: roach1
+    image: cockroachdb/cockroach:v21.2.3
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    command: start-single-node --insecure
+    volumes:
+      - roach_data:/var/lib/postgresql/data
   gateway:
     build: ./gateway/
     ports:
@@ -8,3 +17,10 @@ services:
     build: ./service/file_service
     ports:
       - "3050:3050"
+  user_service:
+    build: ./service/user_service
+    ports:
+      - "8084:8084"
+
+volumes:
+  roach_data:
