@@ -2,7 +2,7 @@ const express = require('express');
 
 const app = express();
 
-app.use('/', (req, res) => {
+app.use('/', (_req, res) => {
   res.end(`app ${process.argv[2]} on the line`);
 });
 

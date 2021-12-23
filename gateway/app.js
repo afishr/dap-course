@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const flatCache = require('flat-cache');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const PORT = 80;
@@ -29,11 +30,33 @@ const currentChildIterator = (childrenSize, start = -1) => {
   };
 };
 
+const cache = flatCache.load('cache');
+const flatCacheMiddleware = (req, res, next) => {
+  const key = '__express__' + req.originalUrl || req.url;
+  const cacheContent = cache.getKey(key);
+
+  if (cacheContent) {
+    res.send(cacheContent);
+  } else {
+    res.sendResponse = res.send;
+    res.send = (body) => {
+      cache.setKey(key, body);
+      cache.save();
+
+      res.sendResponse(body);
+    };
+
+    next();
+  }
+};
+
 const app = express();
 
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.get('/', flatCacheMiddleware);
 
 // Authorization
 app.use('/', (req, res, next) => {
