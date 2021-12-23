@@ -78,9 +78,9 @@ app.use(
       const serviceChildren = children['fileService'];
       const childrenSize = serviceChildren.length;
       const getCurrentChild = currentChildIterator(childrenSize);
-      const string = serviceChildren[getCurrentChild()];
+      const url = serviceChildren[getCurrentChild()];
 
-      return string
+      return url
     },
   })
 );
@@ -93,10 +93,12 @@ app.use(
       [`^/userService`]: '',
     },
     router: () => {
-      const serviceChildren = children['userService']
+      const serviceChildren = children['userService'];
       const childrenSize = serviceChildren.length;
+      const getCurrentChild = currentChildIterator(childrenSize);
+      const url = serviceChildren[getCurrentChild()];
 
-      return serviceChildren[currentChildIterator(childrenSize)]
+      return url
     },
   }),
 );
