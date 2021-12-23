@@ -9,11 +9,13 @@ import com.file_service.plugins.configureSockets
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
-import io.ktor.server.engine.*
+import io.ktor.response.*
+import io.ktor.routing.*
 import io.ktor.server.netty.*
 
-fun main() {
-    embeddedServer(Netty, port = 3050, host = "0.0.0.0") {
+fun main(args: Array<String>): Unit = EngineMain.main(args)
+
+fun Application.module(testing: Boolean = false) {
         val secret = "secret"
         val issuer = "http://0.0.0.0:8084/"
         val audience = "http://0.0.0.0:8084/hello"
@@ -37,5 +39,9 @@ fun main() {
         configureSockets()
         configureHTTP()
         configureFileController()
-    }.start(wait = true)
+    routing {
+        get("/") {
+            call.respondText("Hello, world!")
+        }
+    }
 }
