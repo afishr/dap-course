@@ -4,20 +4,11 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const PORT = 80;
 const HOST = 'localhost';
-const children = ['http://localhost:1234', 'http://localhost:4321'];
-
-const currentChildIterator = (childrenSize, start = -1) => {
-  return () => {
-    start++;
-
-    if (start >= childrenSize) {
-      start = 0;
-    }
-
-    return start;
-  };
+const children = {
+  'file': 'http://localhost:3050',
+  'user': 'http://localhost:8084',
+  'cache': 'http://localhost:3050',
 };
-const getCurrentChild = currentChildIterator(children.length);
 
 const app = express();
 
@@ -25,13 +16,34 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use(
-  '/',
-  createProxyMiddleware({
-    changeOrigin: false,
-    router: () => {
-      return children[getCurrentChild()]
+// Authorization
+app.use('/', (req, res, next) => {
+  if (req.headers.authorization) {
+    next();
+  } else {
+    res.sendStatus(403);
   }
+});
+
+app.use(
+  '/fileService',
+  createProxyMiddleware({
+    target: 'http://dap-course_file_service_1:3050',
+    changeOrigin: true,
+    pathRewrite: {
+      [`^/fileService`]: '',
+    },
+  })
+);
+
+app.use(
+  '/userService',
+  createProxyMiddleware({
+    target: 'http://dap-course_user_service_1:8084',
+    changeOrigin: true,
+    pathRewrite: {
+      [`^/userService`]: '',
+    },
   }),
 );
 
