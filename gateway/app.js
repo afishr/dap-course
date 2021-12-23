@@ -5,7 +5,18 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const PORT = 80;
 const HOST = 'localhost';
-const children = ['http://localhost:1234', 'http://localhost:4321'];
+const children = {
+  'fileService': [
+    'http://dap-course_file_service1_1:3050',
+    'http://dap-course_file_service2_1:3051',
+    'http://dap-course_file_service3_1:3052'
+  ],
+  'userService': [
+    'http://dap-course_user_service_1:8084',
+    'http://dap-course_user_service_1:8084',
+    'http://dap-course_user_service_1:8084'
+  ],
+};
 
 const currentChildIterator = (childrenSize, start = -1) => {
   return () => {
@@ -18,7 +29,6 @@ const currentChildIterator = (childrenSize, start = -1) => {
     return start;
   };
 };
-const getCurrentChild = currentChildIterator(children.length);
 
 const cache = flatCache.load('cache');
 const flatCacheMiddleware = (req, res, next) => {
@@ -48,13 +58,46 @@ app.use(express.urlencoded({ extended: false }));
 
 app.get('/', flatCacheMiddleware);
 
-app.use(
-  '/',
-  createProxyMiddleware({
-    changeOrigin: false,
-    router: () => {
-      return children[getCurrentChild()]
+// Authorization
+app.use('/', (req, res, next) => {
+  if (req.headers.authorization) {
+    next();
+  } else {
+    res.sendStatus(403);
   }
+});
+
+app.use(
+  '/fileService',
+  createProxyMiddleware({
+    changeOrigin: true,
+    pathRewrite: {
+      [`^/fileService`]: '',
+    },
+    router: () => {
+      const serviceChildren = children['fileService'];
+      const childrenSize = serviceChildren.length;
+      const getCurrentChild = currentChildIterator(childrenSize);
+      const string = serviceChildren[getCurrentChild()];
+
+      return string
+    },
+  })
+);
+
+app.use(
+  '/userService',
+  createProxyMiddleware({
+    changeOrigin: true,
+    pathRewrite: {
+      [`^/userService`]: '',
+    },
+    router: () => {
+      const serviceChildren = children['userService']
+      const childrenSize = serviceChildren.length;
+
+      return serviceChildren[currentChildIterator(childrenSize)]
+    },
   }),
 );
 
