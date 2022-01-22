@@ -1,6 +1,5 @@
 const express = require('express');
 const morgan = require('morgan');
-const flatCache = require('flat-cache');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const redis = require('redis');
 const axios = require('axios')
@@ -32,7 +31,7 @@ const currentChildIterator = (childrenSize, start = -1) => {
   };
 };
 
-const redisClient = redis.createClient({ url: 'redis://dap-course_redis_1:6379' });
+const redisClient = redis.createClient({ url: 'redis://redis-master:6379' });
 
 (async () => {
   redisClient.on('error', (err) => console.log('Redis Client Error', err));

@@ -1,8 +1,8 @@
 version: "3.9"
 services:
   redis:
+    container_name: redis-master
     image: "redis:alpine"
-#    command: redis-server --requirepass sOmE_sEcUrE_pAsS
     command: redis-server
     ports:
       - "6379:6379"
@@ -11,18 +11,33 @@ services:
       - $PWD/redis.conf:/usr/local/etc/redis/redis.conf
     environment:
       - REDIS_REPLICATION_MODE=master
-#    networks:
-#      node_net:
-#        ipv4_address: 172.28.1.4
-  database:
-    container_name: roach1
-    image: cockroachdb/cockroach:v21.2.3
+
+  redis-slave:
+    image: "redis:alpine"
+    container_name: redis-slave
+    ports:
+      - "6380:6379"
+    command: redis-server --slaveof redis-master 6379
+    depends_on:
+      - redis
+
+  node_1:
+    container_name: node_1
+    image: cockroachdb/cockroach:latest
+    volumes:
+      - ./data/node_1:/cockroach/cockroach-data
+    command: start --insecure --join=node_1,node_2
     ports:
       - "26257:26257"
       - "8080:8080"
-    command: start-single-node --insecure
+
+  node_2:
+    container_name: node_2
+    image: cockroachdb/cockroach:latest
     volumes:
-      - roach_data:/var/lib/postgresql/data
+      - ./data/node_2:/cockroach/cockroach-data
+    command: start --insecure --join=node_1,node_2
+
   gateway:
     build: ./gateway/
     ports:
@@ -50,12 +65,5 @@ services:
     ports:
       - "8084:8084"
 
-# networking for the Redis container
-#networks:
-#  node_net:
-#    ipam:
-#      driver: default
-#      config:
-#        - subnet: 172.28.0.0/16
 volumes:
   roach_data:
