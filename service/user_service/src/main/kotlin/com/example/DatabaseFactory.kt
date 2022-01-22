@@ -12,7 +12,7 @@ object DatabaseFactory {
     private fun hikari(): HikariDataSource {
         val config = HikariConfig()
         config.driverClassName = "org.postgresql.Driver"
-        config.jdbcUrl = "jdbc:postgresql://roach1:26257/defaultdb"
+        config.jdbcUrl = "jdbc:postgresql://node_1:26257/defaultdb"
         config.maximumPoolSize = 3
         config.isAutoCommit = false
         config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
