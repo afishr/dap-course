@@ -5,7 +5,7 @@ EXPOSE 3050:3050
 
 COPY . /file_service
 WORKDIR /file_service
-RUN ./gradlew --no-daemon installDist
+RUN ./gradlew installDist
 
 RUN mkdir /app
 COPY ./build/install/file_service/ /app/
