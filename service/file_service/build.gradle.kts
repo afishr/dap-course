@@ -7,7 +7,10 @@ plugins {
     application
     kotlin("jvm") version "1.5.31"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.5.31"
+//    id("com.github.johnrengelman.shadow") version "4.0.1"
 }
+
+//project.setProperty("mainClassName", "com.your.MainClass")
 
 group = "com.file_service"
 version = "0.0.1"
