@@ -16,29 +16,33 @@ import io.ktor.server.netty.*
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 fun Application.module(testing: Boolean = false) {
-        val secret = "secret"
-        val issuer = "http://0.0.0.0:8084/"
-        val audience = "http://0.0.0.0:8084/hello"
-        val realm = "Access to 'hello'"
+    DatabaseFactory.init()
 
-        install(Authentication) {
-            jwt("auth-jwt") {
-                this.realm = realm
+    val secret = "secret"
+    val issuer = "http://0.0.0.0:8084/"
+    val audience = "http://0.0.0.0:8084/hello"
+    val realm = "Access to 'hello'"
 
-                verifier(
-                    JWT
+    install(Authentication) {
+        jwt("auth-jwt") {
+            this.realm = realm
+
+            verifier(
+                JWT
                     .require(Algorithm.HMAC256(secret))
                     .withAudience(audience)
                     .withIssuer(issuer)
-                    .build())
-            }
+                    .build()
+            )
         }
-        configureDependencyInjection()
-        configureRouting()
-        configureSerialization()
-        configureSockets()
-        configureHTTP()
-        configureFileController()
+    }
+    configureDependencyInjection()
+    configureRouting()
+    configureSerialization()
+    configureSockets()
+    configureHTTP()
+    configureFileController()
+
     routing {
         get("/") {
             call.respondText("Hello, world!")

@@ -1,5 +1,6 @@
 package com.file_service.file
 
+import com.file_service.file.dao.FileDao
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -7,7 +8,7 @@ import io.ktor.request.*
 import io.ktor.response.*
 import java.io.File
 
-class FileService {
+class FileService(private val fileDao: FileDao) {
     companion object {
         const val FILE_DIRECTORY_PATH = "FILEUPLOADS"
     }
@@ -16,9 +17,11 @@ class FileService {
         val multipart = call.receiveMultipart()
         val directory = File(FILE_DIRECTORY_PATH)
 
-        if(!directory.exists()) {
+        if (!directory.exists()) {
             directory.mkdirs()
         }
+
+        var file: File? = null
 
         multipart.forEachPart { part ->
 
@@ -26,16 +29,16 @@ class FileService {
             if (part is PartData.FileItem) {
                 // retrieve file name of upload
                 val name = part.originalFileName!!
-                val file = File(FILE_DIRECTORY_PATH, name)
+                file = File(FILE_DIRECTORY_PATH, name)
 
                 // use InputStream from part to save file
                 part.streamProvider().use { its ->
 
                     // copy the stream to the file with buffering
-                    file.outputStream().buffered().use {
+                    file?.outputStream()?.buffered().use {
 
                         // note that this is blocking
-                        its.copyTo(it)
+                        its.copyTo(it!!)
                     }
                 }
             }
@@ -44,6 +47,7 @@ class FileService {
             part.dispose()
         }
 
+        file?.path?.let { fileDao.createFile(it, 1) }
         call.respondText("OK", status = HttpStatusCode.Created)
     }
 
