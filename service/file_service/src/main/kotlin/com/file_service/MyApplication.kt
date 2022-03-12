@@ -8,7 +8,7 @@ import org.koin.logger.SLF4JLogger
 
 fun Application.configureDependencyInjection() {
     val helloAppModule = module {
-        single { FileService() } // get() Will resolve HelloRepository
+        single { FileService(get()) } // get() Will resolve HelloRepository
     }
 
     // Declare Koin
